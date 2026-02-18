@@ -32,17 +32,25 @@ example: BinarySearchTree[int] = BinarySearchTree(Node(10, None, None), lambda x
 print(example.tree)
 
 
+# Returns whether two values are equal according to the `comes_before` function
+def equal(a: T, b: T, comes_before: Callable[[T, T], bool]) -> bool:
+    if not comes_before(a, b) and not comes_before(b, a):
+        return True
+
+    return False
+
+
 # Find if a `value` is in a given `tree`
-def lookup(tree: BinarySearchTree[T], value: T) -> T:
-    # Lookup — given a BinarySearchTree and a value as arguments, return
-    # True if the value is stored in the tree and False otherwise. You will want to use
-    # a helper function that operates on BinTrees. This helper function will need to
-    # take a comes_before-type function as an extra input.
-    # Do not use the == or != operators. The key is to use comes_before any time
-    # you need to compare two values. How do you check whether two values a and b
-    # are equal? You know they are equal if comes_before( a, b ) returns
-    # False and comes_before( b, a ) also returns False
-    pass
+def lookup(bst: BinarySearchTree[T], target: T) -> bool:
+    if bst.tree is not None:
+        if equal(bst.tree.value, target, bst.comes_before):
+            return True
+
+    return max(
+        equal(bst.tree.right.value, target, bst.comes_before) if bst.tree.right is not None else False,
+        lookup(BinarySearchTree(bst.tree.left, bst.comes_before), target) if bst.tree.left is not None else False,
+        lookup(BinarySearchTree(bst.tree.right, bst.comes_before), target) if bst.tree.right is not None else False
+    )
 
 
 def insert(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
@@ -66,4 +74,5 @@ def delete(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
     # nodes containing the value to be removed, only a single such node will be
     # removed.
     # This function returns the resulting BinarySearchTree.
+
     pass
