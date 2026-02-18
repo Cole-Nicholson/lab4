@@ -48,7 +48,7 @@ def lookup(bst: BinarySearchTree[T], target: T) -> bool:
     if equal(bst.tree.value, target, bst.comes_before):
         return True
 
-    if bst.comes_before(bst.tree.value,target):
+    if bst.comes_before(bst.tree.value, target):
         return lookup(BinarySearchTree(bst.tree.left, bst.comes_before), target)
     else:
         return lookup(BinarySearchTree(bst.tree.right, bst.comes_before), target)
@@ -67,7 +67,18 @@ def insert(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
     pass
 
 
-def delete(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
+def tree_max(bst: BinarySearchTree[T]) -> T:
+    if bst.tree.right.value is not None:
+        return tree_max(BinarySearchTree(bst.tree.right, bst.comes_before))
+
+    return bst.tree.value
+
+
+def tree_without(bst: BinarySearchTree[T], max_val: T) -> BinarySearchTree[T]:
+    pass
+
+
+def delete(bst: BinarySearchTree[T], target: T) -> BinarySearchTree[T]:
     # delete — given a BinarySearchTree and a value as arguments, remove
     # the value from the tree (if present) while preserving the binary search tree
     # property that, for a given node’s value, the values in the left subtree come before
@@ -76,4 +87,12 @@ def delete(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
     # removed.
     # This function returns the resulting BinarySearchTree.
 
-    pass
+    if equal(bst.tree.value, target, bst.comes_before):
+        max_val = tree_max(BinarySearchTree(bst.tree.left, bst.comes_before))
+        without = tree_without(bst, max_val)
+        return BinarySearchTree(Node(max_val,without.tree.left, without.tree.right), bst.comes_before)
+
+    if bst.comes_before(bst.tree.value, target):
+        return delete(BinarySearchTree(bst.tree.left, bst.comes_before), target)
+    else:
+        return delete(BinarySearchTree(bst.tree.right, bst.comes_before), target)
