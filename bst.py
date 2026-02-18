@@ -42,15 +42,16 @@ def equal(a: T, b: T, comes_before: Callable[[T, T], bool]) -> bool:
 
 # Find if a `value` is in a given `tree`
 def lookup(bst: BinarySearchTree[T], target: T) -> bool:
-    if bst.tree is not None:
-        if equal(bst.tree.value, target, bst.comes_before):
-            return True
+    if bst.tree is None:
+        return False
 
-    return max(
-        equal(bst.tree.right.value, target, bst.comes_before) if bst.tree.right is not None else False,
-        lookup(BinarySearchTree(bst.tree.left, bst.comes_before), target) if bst.tree.left is not None else False,
-        lookup(BinarySearchTree(bst.tree.right, bst.comes_before), target) if bst.tree.right is not None else False
-    )
+    if equal(bst.tree.value, target, bst.comes_before):
+        return True
+
+    if bst.comes_before(bst.tree.value,target):
+        return lookup(BinarySearchTree(bst.tree.left, bst.comes_before), target)
+    else:
+        return lookup(BinarySearchTree(bst.tree.right, bst.comes_before), target)
 
 
 def insert(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
