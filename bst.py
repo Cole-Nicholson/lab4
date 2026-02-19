@@ -49,9 +49,9 @@ def lookup(bst: BinarySearchTree[T], target: T) -> bool:
         return True
 
     if bst.comes_before(bst.tree.value, target):
-        return lookup(BinarySearchTree(bst.tree.left, bst.comes_before), target)
-    else:
         return lookup(BinarySearchTree(bst.tree.right, bst.comes_before), target)
+    else:
+        return lookup(BinarySearchTree(bst.tree.left, bst.comes_before), target)
 
 
 def insert(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
@@ -67,15 +67,37 @@ def insert(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
     pass
 
 
-def tree_max(bst: BinarySearchTree[T]) -> T:
-    if bst.tree.right.value is not None:
-        return tree_max(BinarySearchTree(bst.tree.right, bst.comes_before))
+def tree_max(tree: Node[T], comes_before: Callable[[T, T], bool]) -> T:
+    if tree is None:
+        return None
+    if tree.right.value is not None:
+        return tree_max(tree.right, comes_before)
 
-    return bst.tree.value
+    return tree.value
 
 
-def tree_without(bst: BinarySearchTree[T], max_val: T) -> BinarySearchTree[T]:
-    pass
+def tree_without(tree: BinTree[T], target: T, comes_before: Callable[[T, T], bool]) -> BinTree[T]:
+    if tree is None:
+        return None
+
+    if equal(tree.value, target, comes_before):
+        return None
+
+    if comes_before(tree.value, target):
+        return Node(
+            tree.value,
+            tree_without(
+                tree.left,
+                target, comes_before),
+            tree.right
+        )
+    else:
+        return Node(
+            tree.value,
+            tree.left,
+            tree_without(
+                tree.right, target, comes_before)
+        )
 
 
 def delete(bst: BinarySearchTree[T], target: T) -> BinarySearchTree[T]:
@@ -86,13 +108,42 @@ def delete(bst: BinarySearchTree[T], target: T) -> BinarySearchTree[T]:
     # nodes containing the value to be removed, only a single such node will be
     # removed.
     # This function returns the resulting BinarySearchTree.
+    return BinarySearchTree(delete_helper(bst.tree, target, bst.comes_before), bst.comes_before)
 
-    if equal(bst.tree.value, target, bst.comes_before):
-        max_val = tree_max(BinarySearchTree(bst.tree.left, bst.comes_before))
-        without = tree_without(bst, max_val)
-        return BinarySearchTree(Node(max_val,without.tree.left, without.tree.right), bst.comes_before)
 
-    if bst.comes_before(bst.tree.value, target):
-        return delete(BinarySearchTree(bst.tree.left, bst.comes_before), target)
+def delete_helper(tree: BinTree[T], target: T, comes_before: Callable[[T, T], bool]) -> BinTree[T]:
+    # if equal(tree.value, target, bst.comes_before):
+    #     max_val = tree_max(BinarySearchTree(bst.tree.left, bst.comes_before))
+    #     if max_val is None:
+    #         return BinarySearchTree(Node(bst.tree.value, None, bst.tree.right), bst.comes_before)
+    #     without = tree_without(bst, max_val)
+    #     return BinarySearchTree(Node(max_val, without.tree.left, without.tree.right), bst.comes_before)
+    #
+    # if bst.comes_before(bst.tree.value, target):
+    #     if bst.tree.right is None:
+    #         return None
+    #     return delete(BinarySearchTree(bst.tree.right, bst.comes_before), target)
+    # else:
+    #     return delete(BinarySearchTree(bst.tree.left, bst.comes_before), target)
+    # pass
+
+    if equal(tree.value, target, comes_before):
+        if tree.left is None:
+            return tree_without(tree.right, target, comes_before)
+        elif tree.right is None:
+            return tree_without(tree.left, target, comes_before)
+        else:
+            max_val = tree_max(tree.left, comes_before)
+            if max_val is None:
+                # Left tree is empty
+                return tree_without(tree, max_val, comes_before)
+            return Node(max_val, tree_without(tree.left, max_val, comes_before), tree.right)
+
+    if comes_before(tree.value, target):
+        if tree.right is None:
+            return None
+        return Node(tree.value, tree.left, delete_helper(tree.right, target, comes_before))
     else:
-        return delete(BinarySearchTree(bst.tree.right, bst.comes_before), target)
+        if tree.left is None:
+            return None
+        return Node(tree.value, delete_helper(tree.left, target, comes_before), tree.right)
