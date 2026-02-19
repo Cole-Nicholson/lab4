@@ -1,10 +1,8 @@
 ﻿import sys
 import unittest
-from typing import *
-from dataclasses import dataclass
+from bst import delete, insert, lookup, BinarySearchTree, Node
 
 sys.setrecursionlimit(10 ** 9)
-from bst import delete, insert, lookup, BinarySearchTree, Node
 
 
 class BSTTests(unittest.TestCase):
