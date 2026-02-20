@@ -15,8 +15,8 @@ type BinTree[T] = Node[T] | None
 @dataclass(frozen=True)
 class Node(Generic[T]):
     value: Any
-    left: BinTree
-    right: BinTree
+    left: BinTree[T]
+    right: BinTree[T]
 
 
 @dataclass(frozen=True)
@@ -43,7 +43,6 @@ def equal(a: T, b: T, comes_before: Callable[[T, T], bool]) -> bool:
 def lookup(bst: BinarySearchTree[T], target: T) -> bool:
     if bst.tree is None:
         return False
-
     if equal(bst.tree.value, target, bst.comes_before):
         return True
 
@@ -53,17 +52,19 @@ def lookup(bst: BinarySearchTree[T], target: T) -> bool:
         return lookup(BinarySearchTree(bst.tree.left, bst.comes_before), target)
 
 
-def insert(tree: BinarySearchTree[T], value: T) -> BinarySearchTree[T]:
-    # insert — given a BinarySearchTree and a value as arguments, add the
-    # value to the tree by using the comes_before attribute to determine which
-    # path to take at each node; insert into the left subtree if the value "comes before"
-    # the value stored in the current node and into the right subtree otherwise. Again,
-    # you should write a helper function that does all the recursive work using
-    # BinTree. This helper function needs to accept the comes_before field of
-    # BinarySearchTree as another argument.
-    # This function returns the resulting BinarySearchTree.
-    # Make sure to avoid inserting duplicate values!
-    pass
+def left_or_right(Target: T, bst: BinTree[T], comes_before: Callable[[T, T], bool])->BinTree[T]:
+    if bst is None:
+        return Node(Target, None, None)
+    elif comes_before(Target, bst.value):
+        return Node(bst.value, left_or_right(Target, bst.left, comes_before), bst.right)
+    elif comes_before(bst.value, Target):
+        return Node(bst.value, bst.left, left_or_right(Target, bst.right, comes_before))
+    else: 
+        return bst
+    
+# adds target value and returns new tree
+def insert(bst: BinarySearchTree[T], Target: T) -> BinarySearchTree[T]:
+    return BinarySearchTree(left_or_right(Target, bst.tree, bst.comes_before), bst.comes_before)
 
 
 def tree_max(tree: Node[T], comes_before: Callable[[T, T], bool]) -> T:
@@ -100,32 +101,12 @@ def tree_without(tree: BinTree[T], target: T, comes_before: Callable[[T, T], boo
 
 
 def delete(bst: BinarySearchTree[T], target: T) -> BinarySearchTree[T]:
-    # delete — given a BinarySearchTree and a value as arguments, remove
-    # the value from the tree (if present) while preserving the binary search tree
-    # property that, for a given node’s value, the values in the left subtree come before
-    # and the values in the right subtree do not. If the tree happens to have multiple
-    # nodes containing the value to be removed, only a single such node will be
-    # removed.
-    # This function returns the resulting BinarySearchTree.
     return BinarySearchTree(delete_helper(bst.tree, target, bst.comes_before), bst.comes_before)
 
 
 def delete_helper(tree: BinTree[T], target: T, comes_before: Callable[[T, T], bool]) -> BinTree[T]:
-    # if equal(tree.value, target, bst.comes_before):
-    #     max_val = tree_max(BinarySearchTree(bst.tree.left, bst.comes_before))
-    #     if max_val is None:
-    #         return BinarySearchTree(Node(bst.tree.value, None, bst.tree.right), bst.comes_before)
-    #     without = tree_without(bst, max_val)
-    #     return BinarySearchTree(Node(max_val, without.tree.left, without.tree.right), bst.comes_before)
-    #
-    # if bst.comes_before(bst.tree.value, target):
-    #     if bst.tree.right is None:
-    #         return None
-    #     return delete(BinarySearchTree(bst.tree.right, bst.comes_before), target)
-    # else:
-    #     return delete(BinarySearchTree(bst.tree.left, bst.comes_before), target)
-    # pass
-
+    if tree is None:
+        return None
     if equal(tree.value, target, comes_before):
         if tree.left is None:
             return tree_without(tree.right, target, comes_before)
