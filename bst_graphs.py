@@ -7,13 +7,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-# from bst import *
+from bst import BinarySearchTree, insert, delete, lookup
 
 sys.setrecursionlimit(10 ** 9)
 
-
 TREES_PER_RUN: int = 10 ** 4
 
+
+def float_cmp(a: float, b: float) -> bool:
+    return a < b
+
+
+def random_tree(n: int) -> BinarySearchTree[float]:
+    tree = BinarySearchTree(None, float_cmp)
+    for _ in range(n):
+        insert(tree, random.random())
+
+    return tree
 
 
 def example_graph_creation() -> None:
