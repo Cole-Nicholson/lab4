@@ -1,10 +1,11 @@
 ﻿import math
-import random
 import sys
 import unittest
 from dataclasses import dataclass
 from bst import delete, insert, lookup, BinarySearchTree, Node, equal
 import random
+
+from bst_graphs import height
 
 sys.setrecursionlimit(10 ** 9)
 
@@ -37,44 +38,44 @@ class BSTTests(unittest.TestCase):
 
         tree = BinarySearchTree(None, str_cmp)
         for elem in ["A", "Z", "D", "B"]:
-            insert(tree, elem)
+            tree = insert(tree, elem)
 
         for elem in ["Z", "A", "D", "B"]:
-            self.assertTrue(lookup(tree, elem))
-            delete(tree, elem)
-            self.assertFalse(lookup(tree, elem))
+            self.assertTrue(lookup(tree, elem), f"Failed on {elem}")
+            tree = delete(tree, elem)
+            self.assertFalse(lookup(tree, elem), f"Failed on {elem}")
 
     def test_point(self):
         @dataclass(frozen=True)
-        class P:
+        class Point2D:
             x: int
             y: int
 
             def distance(self) -> float:
                 return math.sqrt(self.x ** 2 + self.y ** 2)
 
-        def point_cmp(v1: P, v2: P) -> bool:
+        def point_cmp(v1: Point2D, v2: Point2D) -> bool:
             return v1.distance() < v2.distance()
 
-        self.assertTrue(point_cmp(P(0, 0), (P(1, 1))))
-        self.assertFalse(point_cmp(P(1, 1), (P(0, 0))))
-        self.assertTrue(equal(P(1, 1), (P(1, 1)), point_cmp))
+        self.assertTrue(point_cmp(Point2D(0, 0), (Point2D(1, 1))))
+        self.assertFalse(point_cmp(Point2D(1, 1), (Point2D(0, 0))))
+        self.assertTrue(equal(Point2D(1, 1), (Point2D(1, 1)), point_cmp))
 
         random.seed(0)
 
-        def generatePoint() -> P:
-            return P(random.randint(0, 10_000_000), random.randint(0, 10_000_000))
+        def generatePoint() -> Point2D:
+            return Point2D(random.randint(0, 10_000_000), random.randint(0, 10_000_000))
 
         tree = BinarySearchTree(None, point_cmp)
         points = [generatePoint() for _ in range(100)]
 
         for elem in points:
-            insert(tree, elem)
+            tree = insert(tree, elem)
 
         for elem in points:
-            self.assertTrue(lookup(tree, elem))
-            delete(tree, elem)
-            self.assertFalse(lookup(tree, elem))
+            self.assertTrue(lookup(tree, elem), f"Failed on {elem}")
+            tree = delete(tree, elem)
+            self.assertFalse(lookup(tree, elem), f"Failed on {elem}")
 
     def test_reverse_int(self):
         def reverse_cmp(v1: int, v2: int) -> bool:
@@ -87,15 +88,30 @@ class BSTTests(unittest.TestCase):
         random.seed(0)
 
         tree = BinarySearchTree(None, reverse_cmp)
-        points = [random.randint(0, 10_000_000) for _ in range(100)]
+        points = [i for i in range(100)]
+        random.shuffle(points)
 
         for elem in points:
-            insert(tree, elem)
+            tree = insert(tree, elem)
 
         for elem in points:
-            self.assertTrue(lookup(tree, elem))
-            delete(tree, elem)
-            self.assertFalse(lookup(tree, elem))
+            self.assertTrue(lookup(tree, elem), f"Failed on {elem}")
+            tree = delete(tree, elem)
+            self.assertFalse(lookup(tree, elem), f"Failed on {elem}")
+
+    def test_insert(self):
+        # Test worse case of a tree insert
+        tree = BinarySearchTree[int](None, lambda a, b: a < b)
+        for i in range(100):
+            tree = insert(tree, i)
+        self.assertTrue(height(tree.tree) == 100)
+
+        l = list(range(100))
+        random.shuffle(l)
+
+        for idx,i in enumerate(l, start=1):
+            tree = delete(tree, i)
+            self.assertTrue(height(tree.tree) == 100-idx, f"Failed on {idx}")
 
 
 if __name__ == '__main__':
