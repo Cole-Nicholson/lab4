@@ -10,9 +10,9 @@ import time
 
 from bst import BinarySearchTree, insert, delete, lookup, BinTree
 
-sys.setrecursionlimit(10 ** 9)
+sys.setrecursionlimit(10**9)
 
-TREES_PER_RUN: int = 10 ** 4
+TREES_PER_RUN: int = 10**4
 SAMPLE_COUNT = 50
 
 
@@ -35,7 +35,7 @@ def sample_values(max_value: int) -> List[int]:
     return [int(round(stepSize * n)) for n in range(1, SAMPLE_COUNT + 1)]
 
 
-def height(tree: BinTree[float]) -> int:
+def height(tree: BinTree[int] | BinTree[float]) -> int:
     if tree is None:
         return 0
 
@@ -61,7 +61,9 @@ def generateHeight():
         ys.append(sum(heights) / len(heights))
         xs.append(sample_size)
 
-    make_graph(xs, ys, "Height", "Height of different trees based on number of elements")
+    make_graph(
+        xs, ys, "Height", "Height of different trees based on number of elements"
+    )
 
 
 def generateInsert():
@@ -81,10 +83,14 @@ def generateInsert():
         print(xs2)
         print(ys2)
 
-    make_graph(xs2, ys2, "Time (ns)", "Time to insert into trees with different element counts")
+    make_graph(
+        xs2, ys2, "Time (ns)", "Time to insert into trees with different element counts"
+    )
 
 
-def make_graph(x_coords: List[float], y_coords: List[float], unit: str, title: str) -> None:
+def make_graph(
+    x_coords: List[float], y_coords: List[float], unit: str, title: str
+) -> None:
     # Could have just used this type from the start, but I want
     # to emphasize that 'matplotlib' uses 'numpy''s specific array
     # type, which is different from the built-in Python array
@@ -100,6 +106,6 @@ def make_graph(x_coords: List[float], y_coords: List[float], unit: str, title: s
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     generateHeight()
     generateInsert()

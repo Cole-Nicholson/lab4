@@ -7,7 +7,7 @@ import random
 
 from bst_graphs import height
 
-sys.setrecursionlimit(10 ** 9)
+sys.setrecursionlimit(10**9)
 
 
 class BSTTests(unittest.TestCase):
@@ -18,21 +18,21 @@ class BSTTests(unittest.TestCase):
         self.assertTrue(str_cmp("Apple", "Banana"))
         self.assertTrue(not str_cmp("Hello World", "A"))
         self.assertFalse(lookup(BinarySearchTree(None, str_cmp), "Hello world"))
-        self.assertFalse(lookup(BinarySearchTree(Node("A", None, None), str_cmp), "Hello world"))
-        self.assertTrue(lookup(BinarySearchTree(Node("Banana", Node("A", None, None), None), str_cmp), "A"))
+        self.assertFalse(
+            lookup(BinarySearchTree(Node("A", None, None), str_cmp), "Hello world")
+        )
+        self.assertTrue(
+            lookup(
+                BinarySearchTree(Node("Banana", Node("A", None, None), None), str_cmp),
+                "A",
+            )
+        )
         self.assertTrue(
             lookup(
                 BinarySearchTree(
-                    Node(
-                        "A",
-                        None,
-                        Node(
-                            "Hello World", None, None
-                        )
-                    ),
-                    str_cmp
+                    Node("A", None, Node("Hello World", None, None)), str_cmp
                 ),
-                "Hello World"
+                "Hello World",
             )
         )
 
@@ -52,7 +52,7 @@ class BSTTests(unittest.TestCase):
             y: int
 
             def distance(self) -> float:
-                return math.sqrt(self.x ** 2 + self.y ** 2)
+                return math.sqrt(self.x**2 + self.y**2)
 
         def point_cmp(v1: Point2D, v2: Point2D) -> bool:
             return v1.distance() < v2.distance()
@@ -106,13 +106,13 @@ class BSTTests(unittest.TestCase):
             tree = insert(tree, i)
         self.assertTrue(height(tree.tree) == 100)
 
-        l = list(range(100))
-        random.shuffle(l)
+        con_list = list(range(100))
+        random.shuffle(con_list)
 
-        for idx,i in enumerate(l, start=1):
+        for idx, i in enumerate(con_list, start=1):
             tree = delete(tree, i)
-            self.assertTrue(height(tree.tree) == 100-idx, f"Failed on {idx}")
+            self.assertTrue(height(tree.tree) == 100 - idx, f"Failed on {idx}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

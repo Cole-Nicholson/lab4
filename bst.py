@@ -1,8 +1,8 @@
 ﻿import sys
-from typing import *
+from typing import Generic, Any, TypeVar, Callable
 from dataclasses import dataclass
 
-sys.setrecursionlimit(10 ** 9)
+sys.setrecursionlimit(10**9)
 
 # ---- Data types ----
 # Doing this with generics is more fun and technically safer than just `Any`
@@ -26,7 +26,9 @@ class BinarySearchTree(Generic[T]):
 
 
 # ---- Functions ----
-example: BinarySearchTree[int] = BinarySearchTree(Node(10, None, None), lambda x, y: x < y)
+example: BinarySearchTree[int] = BinarySearchTree(
+    Node(10, None, None), lambda x, y: x < y
+)
 
 
 # Returns whether two values are equal according to the `comes_before` function
@@ -50,7 +52,9 @@ def lookup(bst: BinarySearchTree[T], target: T) -> bool:
         return lookup(BinarySearchTree(bst.tree.left, bst.comes_before), target)
 
 
-def left_or_right(Target: T, bst: BinTree[T], comes_before: Callable[[T, T], bool]) -> BinTree[T]:
+def left_or_right(
+    Target: T, bst: BinTree[T], comes_before: Callable[[T, T], bool]
+) -> BinTree[T]:
     if bst is None:
         return Node(Target, None, None)
     elif comes_before(Target, bst.value):
@@ -63,19 +67,21 @@ def left_or_right(Target: T, bst: BinTree[T], comes_before: Callable[[T, T], boo
 
 # adds target value and returns new tree
 def insert(bst: BinarySearchTree[T], Target: T) -> BinarySearchTree[T]:
-    return BinarySearchTree(left_or_right(Target, bst.tree, bst.comes_before), bst.comes_before)
+    return BinarySearchTree(
+        left_or_right(Target, bst.tree, bst.comes_before), bst.comes_before
+    )
 
 
 def tree_max(tree: Node[T], comes_before: Callable[[T, T], bool]) -> T:
-    if tree is None:
-        raise ValueError("Can't find the max of a 0 height tree")
     if tree.right is not None:
         return tree_max(tree.right, comes_before)
 
     return tree.value
 
 
-def tree_without(tree: BinTree[T], target: T, comes_before: Callable[[T, T], bool]) -> BinTree[T]:
+def tree_without(
+    tree: BinTree[T], target: T, comes_before: Callable[[T, T], bool]
+) -> BinTree[T]:
     if tree is None:
         return None
 
@@ -86,24 +92,25 @@ def tree_without(tree: BinTree[T], target: T, comes_before: Callable[[T, T], boo
         return Node(
             tree.value,
             tree.left,
-            tree_without(
-                tree.right,
-                target, comes_before),
+            tree_without(tree.right, target, comes_before),
         )
     else:
         return Node(
             tree.value,
-            tree_without(
-                tree.left, target, comes_before),
+            tree_without(tree.left, target, comes_before),
             tree.right,
         )
 
 
 def delete(bst: BinarySearchTree[T], target: T) -> BinarySearchTree[T]:
-    return BinarySearchTree(delete_helper(bst.tree, target, bst.comes_before), bst.comes_before)
+    return BinarySearchTree(
+        delete_helper(bst.tree, target, bst.comes_before), bst.comes_before
+    )
 
 
-def delete_helper(tree: BinTree[T], target: T, comes_before: Callable[[T, T], bool]) -> BinTree[T]:
+def delete_helper(
+    tree: BinTree[T], target: T, comes_before: Callable[[T, T], bool]
+) -> BinTree[T]:
     if tree is None:
         return None
     if equal(tree.value, target, comes_before):
@@ -113,13 +120,19 @@ def delete_helper(tree: BinTree[T], target: T, comes_before: Callable[[T, T], bo
             return tree.right
         else:
             max_val = tree_max(tree.left, comes_before)
-            return Node(max_val, tree_without(tree.left, max_val, comes_before), tree.right)
+            return Node(
+                max_val, tree_without(tree.left, max_val, comes_before), tree.right
+            )
 
     if comes_before(tree.value, target):
         if tree.right is None:
             return tree
-        return Node(tree.value, tree.left, delete_helper(tree.right, target, comes_before))
+        return Node(
+            tree.value, tree.left, delete_helper(tree.right, target, comes_before)
+        )
     else:
         if tree.left is None:
             return tree
-        return Node(tree.value, delete_helper(tree.left, target, comes_before), tree.right)
+        return Node(
+            tree.value, delete_helper(tree.left, target, comes_before), tree.right
+        )
